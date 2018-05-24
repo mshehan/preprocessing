@@ -21,13 +21,13 @@ for line in train:
 	trim = line[line.find('\t')+1:]
 # 	print trim
 	tokens = word_tokenize(trim.lower())
-	tokens2 = [unicode(x) for x in tokens if (x not in remove) and (x not in string.punctuation)]
+	tokens2 = [unicode(tok) for tok in tokens if (tok not in remove) and (tok not in string.punctuation)]
 	singles = [stemmer.stem(tok) for tok in tokens2]
 	for token in singles:
 		if token in v_dict:
 			v_dict[token] = v_dict[token] + 1;
 		else:
-			v_dict[token] = 0;
+			v_dict[token] = 1;
 # 	print singles;
 print v_dict;
 for token,count in v_dict.iteritems():
