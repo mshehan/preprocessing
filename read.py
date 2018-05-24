@@ -39,8 +39,8 @@ start = time.clock()
 distinct_tokens = dict()
 corpus = []
 for line in train:
-	
-	tokens = word_tokenize(line.lower())
+	new_line = line[line.find('\t')+1:]
+	tokens = word_tokenize(new_line.lower())
 	filtered_tokens = [word for word in tokens if (word not in remove) and (word not in string.punctuation)]
 	
 	stemmed_tokens = [stemmer.stem( unicode(words)) for words in filtered_tokens]
