@@ -24,7 +24,7 @@ for line in train:
 	tokens2 = [unicode(tok) for tok in tokens if (tok not in remove) and (tok not in string.punctuation)]
 	singles = [stemmer.stem(tok) for tok in tokens2]
 	for token in singles:
-		if token in v_dict:
+		if token in v_dict.keys():
 			v_dict[token] = v_dict[token] + 1;
 		else:
 			v_dict[token] = 1;
