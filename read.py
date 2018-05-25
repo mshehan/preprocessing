@@ -14,7 +14,7 @@ remove = stopwords.words()
 stemmer = PorterStemmer()
 
 train = open("train_file_cmps142_hw3", "r")
-#print "starting preprocessing..."
+print "starting preprocessing..."
 start = time.clock()
 
 #need to get number of distinct tokens in the train set
@@ -38,7 +38,9 @@ start = time.clock()
 
 distinct_tokens = dict()
 corpus = []
+label = []
 for line in train:
+	label = line[line.find('\t')]
 	new_line = line[line.find('\t')+1:]
 	tokens = word_tokenize(new_line.lower())
 	filtered_tokens = [word for word in tokens if (word not in remove) and (word not in string.punctuation)]
@@ -54,24 +56,27 @@ for line in train:
 	corpus.append(stemmed_tokens)
 
 
-# for line in corpus:
-# 	for word in line:
-# 		if distinct_tokens[word] < 5:
-# 			line.remove(word)
+for line in corpus:
+	for word in line:
+		if distinct_tokens[word] < 5:
+			line.remove(word)
 
-vocabulary = []
+vocabulary = dict()
 for k,v in distinct_tokens.iteritems():
 	if v >= 5:
-		vocabulary.append(k)
-for word in sorted(vocabulary):
-	print word
+		vocabulary[k] = v
+
+bag_of_words = [dict() for x in range(len(corpus))]
+
+for index in range(len(corpus)):
+	print index
+	for word in corpus[index]:
+		bag_of_words[index][word] = vocabulary[word] if word in vocabulary.keys() else continue
+
+
 
 #discrepency with unique values top code = 2989, this code says 1131
 #requires step 7 and check on validity of lines 56 - 59 
-			
-
-
-
-
+		
 end = time.clock()
-#print "ended preprocessing in " + str(end-start) + " seconds"
+print "ended preprocessing in " + str(end-start) + " seconds"
