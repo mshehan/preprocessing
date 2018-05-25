@@ -20,6 +20,8 @@ instances = []
 # (label, [features])
 
 train = open("train_file_cmps142_hw3", "r")
+sys.stdout.write("Beginning the preprocessing\n")
+count = 0;
 for line in train:
 	label = line[:line.find('\t')]
 	trim = line[line.find('\t')+1:]
@@ -30,37 +32,38 @@ for line in train:
 	
 	instances.append((label, singles))
 	for token in singles:
+# 		print token,
 		if token in v_dict.keys():
 			v_dict[token] = v_dict[token] + 1;
 		else:
 			v_dict[token] = 1;
-# 	print singles;
-# print v_dict;
-print instances
+	count +=1
+	sys.stdout.write("\rPreprocessing instance %i" % count)
+	sys.stdout.flush()
+sys.stdout.write("\n")
+
+sys.stdout.write("Building vocabulary\n")
 for token,count in v_dict.iteritems():
 	if (token in v_dict) and (v_dict[token] > 4):
 # 		print token
 		vocab.append(token)
-for word in sorted(vocab):
-	print word, ' ',
-print len(vocab)
 
-print
-print 'label,',
+output = open("output_file.csv", "w");
+print "Writing headers"
+output.write('label,')
 for feature in v_dict.keys():
-	print ("%s," % feature),;
-print
+	output.write("\"%s\"," % (feature))
+output.write('\n')
+print "Writing instances"
+count = 0
 for label,features in instances:
-	print "%s," % label,
+	count += 1
+	sys.stdout.write("\rWriting instance %i to file" % count)
+	sys.stdout.flush()
+	output.write("%s," % label)
 	for feat in v_dict.keys():
-		str = feat if (feat in features) else ''
-		print "%s," % str,;
-	print '';
-#for label,features in instances:
-# 	print "%s," % label,;
-# 	for feature in v_dict.keys():
-# 		if feature in features:
-# 			print ("%s," % feature),;
-# 		else:
-# 			print ',',;
-# 	print tokens2;
+		value = 1 if (feat in features) else 0
+		output.write("%i," % value)
+	output.write('\n')
+sys.stdout.write("\n")
+print "Finished."
