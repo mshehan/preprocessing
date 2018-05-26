@@ -140,6 +140,7 @@ def preprocess_train_set(in_stream):
 
 	output.close()
 
+	# will use vocabulary on test set
 	return vocabulary
 
 def _main_():
