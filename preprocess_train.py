@@ -45,12 +45,14 @@ def feature_list_to_csv(corpus, vocabulary, labels):
 		for word,count in vocabulary.items():
 			if word not in line:
 				line[word] = 0
-		line.update({'label': labels[line_num]})
+		if labels is not None:
+			line.update({'label': labels[line_num]})
 		csv_array.append(line)
 		line_num += 1
 	
 	first_line = csv_array[0].keys()
-	first_line.append('label')
+	if labels is not None:
+		first_line.append('label')
 	csv_array.insert(0, first_line)
 	return csv_array
 	
@@ -78,6 +80,29 @@ def write_to_csv(outfile, bag_of_words):
 			outfile.write("%s," % line[key])
 		outfile.write("\n")
 	sys.stdout.write("\nFinished writing csv")
+
+def preprocess_test_set(in_stream, feature_space):
+	count = 1
+	corpus = []
+	remove = stopwords.words()
+	stemmer = PorterStemmer()
+	distinct_tokens = dict()
+	in_stream.seek(0)
+	
+	for line in in_stream:
+		sys.stdout.write("\rProcessing line %d" % count)
+		sys.stdout.flush()
+		count+=1
+		stemmed_tokens = filter_tokens(line)
+		corpus.append(stemmed_tokens)
+		
+	corpus = associate_token_with_count(corpus,feature_space)
+	csv_ready = feature_list_to_csv(corpus,feature_space,None)
+	output = open("output_test_file.csv", "w");
+
+	write_to_csv(output,csv_ready)
+
+	output.close()
 
 def preprocess_train_set(in_stream):
 	count = 1
@@ -110,14 +135,20 @@ def preprocess_train_set(in_stream):
 
 	output.close()
 
+	return vocabulary
+
 def _main_():
-	file = open('./train_file_cmps142_hw3', 'r')
+	
 	#print "starting preprocessing..."
 	start = time.clock()
 	
-	preprocess_train_set(file)
-
-	file.close()
+	train_file = open('./train_file_cmps142_hw3', 'r')
+	vocabulary = preprocess_train_set(train_file)
+	train_file.close()
+	
+	test_file = open('./test_file_cmps142_hw3', 'r')
+	preprocess_test_set(test_file, vocabulary)
+	test_file.close()
 	
 	end = time.clock()
 	#print "ended preprocessing in " + str(end-start) + " seconds"
