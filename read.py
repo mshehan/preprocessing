@@ -45,13 +45,13 @@ sys.stdout.write("\n")
 sys.stdout.write("Building vocabulary\n")
 for token,count in v_dict.iteritems():
 	if (token in v_dict) and (v_dict[token] > 4):
-# 		print token
+		print (v_dict[token], token)
 		vocab.append(token)
 
 output = open("output_file.csv", "w");
 print "Writing headers"
 output.write('label,')
-for feature in v_dict.keys():
+for feature in vocab:
 	output.write("\"%s\"," % (feature))
 output.write('\n')
 print "Writing instances"
@@ -61,7 +61,7 @@ for label,features in instances:
 	sys.stdout.write("\rWriting instance %i to file" % count)
 	sys.stdout.flush()
 	output.write("%s," % label)
-	for feat in v_dict.keys():
+	for feat in vocab:
 		value = 1 if (feat in features) else 0
 		output.write("%i," % value)
 	output.write('\n')
