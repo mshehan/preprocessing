@@ -12,7 +12,7 @@ from nltk.stem.porter import PorterStemmer
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-remove = stopwords.words()
+remove = stopwords.words('english')
 stemmer = PorterStemmer()
 
 def generate_labels_list(in_stream):
@@ -28,7 +28,7 @@ def remove_irrelevant_words(vocabulary):
 			del vocabulary[word]
 	return vocabulary
 
-def fill_corpus_with_zeros(corpus, tokens):
+def associate_token_with_count(corpus, tokens):
 	new_corpus = []
 	for line in corpus:
 		new_corpus.append(dict())
@@ -100,7 +100,7 @@ def preprocess_train_set(in_stream):
 				distinct_tokens[word] = 1
 	sys.stdout.write("\nProcessing complete\n")
 	vocabulary = remove_irrelevant_words(distinct_tokens)
-	corpus = fill_corpus_with_zeros(corpus,vocabulary)
+	corpus = associate_token_with_count(corpus,vocabulary)
 	labels = generate_labels_list(in_stream)
 	csv_ready = feature_list_to_csv(corpus,vocabulary,labels)
 
