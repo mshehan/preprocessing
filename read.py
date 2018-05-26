@@ -3,6 +3,7 @@ import sys
 import nltk
 from nltk import word_tokenize
 from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
 import string
 import time
 from nltk.stem.porter import PorterStemmer
@@ -11,72 +12,61 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 remove = stopwords.words()
-stemmer = PorterStemmer()
+
+# print remove
+print string.punctuation
+stemmer = PorterStemmer();
+v_dict = {}
+vocab = []
+
+instances = []
+# (label, [features])
 
 train = open("train_file_cmps142_hw3", "r")
-print "starting preprocessing..."
-start = time.clock()
-
-#need to get number of distinct tokens in the train set
-# tokens = word_tokenize(train.read().lower())
-# filtered_tokens = [word for word in tokens if word not in remove and word not in string.punctuation]
-# stemmed_tokens = [stemmer.stem(words.decode('utf-8')) for words in filtered_tokens]
-
-# distinct_tokens = dict.fromkeys(set(stemmed_tokens), 0)
-
-# for word in stemmed_tokens:
-# 	distinct_tokens[word] += 1
-
-# vocabulary = stemmed_tokens
-
-# for word in stemmed_tokens:
-# 	if distinct_tokens[word] < 5:
-# 		vocabulary.remove(word)
-
-# vocabulary = set(vocabulary)
-# print "the size of the vocabulary is " + str(len(vocabulary)) 
-
-distinct_tokens = dict()
-corpus = []
-label = []
+sys.stdout.write("Beginning the preprocessing\n")
+count = 0;
 for line in train:
-	label = line[line.find('\t')]
-	new_line = line[line.find('\t')+1:]
-	tokens = word_tokenize(new_line.lower())
-	filtered_tokens = [word for word in tokens if (word not in remove) and (word not in string.punctuation)]
+	label = line[:line.find('\t')]
+	trim = line[line.find('\t')+1:]
+# 	print trim
+	tokens = word_tokenize(trim.lower())
+	tokens2 = [unicode(tok) for tok in tokens if (tok not in remove) and (tok not in string.punctuation)]
+	singles = [stemmer.stem(tok) for tok in tokens2]
 	
-	stemmed_tokens = [stemmer.stem( unicode(words)) for words in filtered_tokens]
-	
-	for word in stemmed_tokens:
-		if word in distinct_tokens.keys():
-			distinct_tokens[word] += 1
+	instances.append((label, singles))
+	for token in singles:
+# 		print token,
+		if token in v_dict.keys():
+			v_dict[token] = v_dict[token] + 1;
 		else:
-			distinct_tokens[word] = 1
-	
-	corpus.append(stemmed_tokens)
+			v_dict[token] = 1;
+	count +=1
+	sys.stdout.write("\rPreprocessing instance %i" % count)
+	sys.stdout.flush()
+sys.stdout.write("\n")
 
+sys.stdout.write("Building vocabulary\n")
+for token,count in v_dict.iteritems():
+	if (token in v_dict) and (v_dict[token] > 4):
+# 		print token
+		vocab.append(token)
 
-for line in corpus:
-	for word in line:
-		if distinct_tokens[word] < 5:
-			line.remove(word)
-
-vocabulary = dict()
-for k,v in distinct_tokens.iteritems():
-	if v >= 5:
-		vocabulary[k] = v
-
-bag_of_words = [dict() for x in range(len(corpus))]
-
-for index in range(len(corpus)):
-	print index
-	for word in corpus[index]:
-		bag_of_words[index][word] = vocabulary[word] if word in vocabulary.keys() else continue
-
-
-
-#discrepency with unique values top code = 2989, this code says 1131
-#requires step 7 and check on validity of lines 56 - 59 
-		
-end = time.clock()
-print "ended preprocessing in " + str(end-start) + " seconds"
+output = open("output_file.csv", "w");
+print "Writing headers"
+output.write('label,')
+for feature in v_dict.keys():
+	output.write("\"%s\"," % (feature))
+output.write('\n')
+print "Writing instances"
+count = 0
+for label,features in instances:
+	count += 1
+	sys.stdout.write("\rWriting instance %i to file" % count)
+	sys.stdout.flush()
+	output.write("%s," % label)
+	for feat in v_dict.keys():
+		value = 1 if (feat in features) else 0
+		output.write("%i," % value)
+	output.write('\n')
+sys.stdout.write("\n")
+print "Finished."
