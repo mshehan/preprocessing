@@ -47,6 +47,7 @@ for token,count in v_dict.iteritems():
 	if (token in v_dict) and (v_dict[token] > 4):
 # 		print token
 		vocab.append(token)
+vocab.sort();
 
 output = open("output_file.csv", "w");
 print "Writing headers"
