@@ -51,8 +51,8 @@ for token,count in v_dict.iteritems():
 output = open("output_file.csv", "w");
 print "Writing headers"
 output.write('label,')
-for feature in v_dict.keys():
-	output.write("\"%s\"," % (feature))
+for feat in vocab:
+	output.write("\"%s\"," % (feat))
 output.write('\n')
 print "Writing instances"
 count = 0
@@ -61,8 +61,8 @@ for label,features in instances:
 	sys.stdout.write("\rWriting instance %i to file" % count)
 	sys.stdout.flush()
 	output.write("%s," % label)
-	for feat in v_dict.keys():
-		value = 1 if (feat in features) else 0
+	for feat in vocab:
+		value = v_dict[feat] if (feat in features) else 0
 		output.write("%i," % value)
 	output.write('\n')
 sys.stdout.write("\n")
