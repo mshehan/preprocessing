@@ -15,6 +15,7 @@ sys.setdefaultencoding('utf-8')
 remove = stopwords.words('english')
 stemmer = PorterStemmer()
 
+#generates a list of the labels for each line
 def generate_labels_list(in_stream):
 	in_stream.seek(0)
 	labels = []
@@ -22,12 +23,15 @@ def generate_labels_list(in_stream):
 		labels.append(line[:line.find('\t')])
 	return labels
 
+#removes words with count less than 5
 def remove_irrelevant_words(vocabulary):
 	for word,count in vocabulary.items():
 		if count < 5:
 			del vocabulary[word]
 	return vocabulary
 
+# creates a bag of words representation. 
+# each word gets its corresponding cout
 def associate_token_with_count(corpus, tokens):
 	new_corpus = []
 	for line in corpus:
@@ -36,7 +40,8 @@ def associate_token_with_count(corpus, tokens):
 			if word in tokens.keys():
 				new_corpus[-1][word] = tokens[word]
 	return new_corpus
-
+# fill each line with 0 counts for words that don't exist
+# map each line to its corresponding header label
 def feature_list_to_csv(corpus, vocabulary, labels):
 	csv_array = []
 	line_num = 0
@@ -55,12 +60,12 @@ def feature_list_to_csv(corpus, vocabulary, labels):
 		first_line.append('label')
 	csv_array.insert(0, first_line)
 	return csv_array
-	
-def filter_tokens(line):
+# tokenize, remove 	
+def filter_tokens(line, stopwords, stemmer):
 	line_without_label = line[line.find('\t')+1:]
 	tokens = word_tokenize(line_without_label.lower())
 
-	filtered_tokens = [word for word in tokens if (word not in remove) and (word not in string.punctuation)]
+	filtered_tokens = [word for word in tokens if (word not in stopwords) and (word not in string.punctuation)]
 	stemmed_tokens = [stemmer.stem(unicode(words)) for words in filtered_tokens]
 	return stemmed_tokens
 
@@ -93,7 +98,7 @@ def preprocess_test_set(in_stream, feature_space):
 		sys.stdout.write("\rProcessing line %d" % count)
 		sys.stdout.flush()
 		count+=1
-		stemmed_tokens = filter_tokens(line)
+		stemmed_tokens = filter_tokens(line,remove,stemmer)
 		corpus.append(stemmed_tokens)
 		
 	corpus = associate_token_with_count(corpus,feature_space)
@@ -116,7 +121,7 @@ def preprocess_train_set(in_stream):
 		sys.stdout.write("\rProcessing line %d" % count)
 		sys.stdout.flush()
 		count+=1
-		stemmed_tokens = filter_tokens(line)
+		stemmed_tokens = filter_tokens(line, remove, stemmer)
 		corpus.append(stemmed_tokens)
 		for word in stemmed_tokens:
 			if word in distinct_tokens:
