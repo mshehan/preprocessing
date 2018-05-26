@@ -1,5 +1,6 @@
 In order to run this you must activate the virtual env.
 > cd path/to/dir
+
 > source ./bin/activate
 once this is done, you can simply run
 > python2 preprocess_train.py
