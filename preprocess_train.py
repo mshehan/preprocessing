@@ -1,3 +1,6 @@
+#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python2
+
+
 import sys
 import nltk
 from nltk import word_tokenize
@@ -60,20 +63,24 @@ def filter_tokens(line):
 	return stemmed_tokens
 
 def write_to_csv(outfile, bag_of_words):
-
+	count = 1
 	for key in bag_of_words[0]:
 		outfile.write("\"%s\"," % key)
 	outfile.write('\n')
 	keys = bag_of_words.pop(0)
+	keys.sort()
 	
 	for line in bag_of_words:
+		sys.stdout.write("\rWriting line %d to csv" % count)
+		sys.stdout.flush()
+		count+=1
 		for key in keys:
 			outfile.write("%s," % line[key])
 		outfile.write("\n")
-
-
+	sys.stdout.write("\nFinished writing csv")
 
 def preprocess_train_set(in_stream):
+	count = 1
 	corpus = []
 	remove = stopwords.words()
 	stemmer = PorterStemmer()
@@ -81,7 +88,9 @@ def preprocess_train_set(in_stream):
 	in_stream.seek(0)
 	
 	for line in in_stream:
-		
+		sys.stdout.write("\rProcessing line %d" % count)
+		sys.stdout.flush()
+		count+=1
 		stemmed_tokens = filter_tokens(line)
 		corpus.append(stemmed_tokens)
 		for word in stemmed_tokens:
@@ -89,7 +98,7 @@ def preprocess_train_set(in_stream):
 				distinct_tokens[word] += 1
 			else:
 				distinct_tokens[word] = 1
-	
+	sys.stdout.write("\nProcessing complete\n")
 	vocabulary = remove_irrelevant_words(distinct_tokens)
 	corpus = fill_corpus_with_zeros(corpus,vocabulary)
 	labels = generate_labels_list(in_stream)
