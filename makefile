@@ -17,10 +17,13 @@ CLASSES = cmps142_hw4/*.class
 all:
 	javac $(ALL) $(JFLAGS)
 
+.java.class:
+	$(JC) $(JFLAGS) $*.java
+
 p1: $(LR_JAVA).class
 	java $(LR_JAVA)
 
-$(LR_JAVA).class:	
+$(LR_JAVA).class: $(LR)
 	javac $(LR) $(JFLAGS)
 
 p2: $(LRB_JAVA).class
@@ -32,10 +35,6 @@ p3: $(LRR_JAVA).class
 	java $(LRR_JAVA)
 $(LRR_JAVA).class: 
 	javac $(LRR) $(JFLAGS)
-
-
-
-
 
 default: .java.class
 

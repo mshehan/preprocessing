@@ -85,6 +85,13 @@ public class LogisticRegression {
                 double lik = 0.0; // Stores log-likelihood of the training data for this iteration
                 for (int i=0; i < instances.size(); i++) {
                     // TODO: Train the model
+                    LRInstance instance = instances.get(i);
+                    double[] new_weights = new double[weights.length];
+                    
+                    for (int feat = 0; feat < weights.length; feat++) {
+                    	new_weights[feat] = weights[feat] +
+                    		(rate * instance.x[feat] * instance.label * predict(instance.x));
+                    }
                     
                     // TODO: Compute the log-likelihood of the data here. Remember to take logs when necessary
 				}
