@@ -9,6 +9,8 @@ import java.lang.Math;
 
 public class LogisticRegression {
 
+		private double log2 = Math.log(2);
+
         /** the learning rate */
         private double rate=0.01;
 
@@ -38,6 +40,7 @@ public class LogisticRegression {
 
         /** TODO: Implement the sigmoid function **/
         private static double sigmoid(double z) {
+        	// System.out.println("Z: " + z);
         	return 1 / (1 + Math.exp(z)); // note: z is already negative
         }
 
@@ -46,9 +49,12 @@ public class LogisticRegression {
         /** This function should call sigmoid() **/
         private double probPred1(double[] x) {
         	double exponent = 0;
+        	// System.out.println("Instance cross weights:");
         	for (int i = 0; i < weights.length; i++) {
+        		// System.out.println(weights[i] * x[i]);
         		exponent -= weights[i] * x[i]; // subtracting from the total so that z is negative in sigmoid
         	}
+        	// System.out.println(exponent);
         	return sigmoid(exponent);
         }
 
@@ -57,6 +63,7 @@ public class LogisticRegression {
         /** This function should call probPred1() **/
         public int predict(double[] x) {
         	double prob = probPred1(x);
+        	// System.out.println(prob);
         	return prob >= 0.5 ? 1 : 0;
         }
 
@@ -84,18 +91,27 @@ public class LogisticRegression {
             for (int n = 0; n < ITERATIONS; n++) {
                 double lik = 0.0; // Stores log-likelihood of the training data for this iteration
                 for (int i=0; i < instances.size(); i++) {
+                	// System.out.print("Instance #" + i);
                     // TODO: Train the model
                     LRInstance instance = instances.get(i);
+                    double lik_j = predict(instance.x);
+                    int label = instance.label;
                     double[] new_weights = new double[weights.length];
                     
                     for (int feat = 0; feat < weights.length; feat++) {
+//                     	System.out.println("x[i]: " + instance.x[feat] + " - label: " + label + " - lik_j: " + lik_j);
                     	new_weights[feat] = weights[feat] +
-                    		(rate * instance.x[feat] * instance.label * predict(instance.x));
+                    		(rate * instance.x[feat] * label * lik_j);
+                    	if (new_weights[feat] != 0) {
+//                     		System.out.println(new_weights[feat]);
+                    	}
                     }
+                    weights = new_weights;
                     
                     // TODO: Compute the log-likelihood of the data here. Remember to take logs when necessary
+                    lik += Math.log(lik_j)/log2;
 				}
-                System.out.println("iteration: " + n + " lik: " + lik);
+                System.out.println("\niteration: " + n + " lik: " + lik);
             }
         }
 
