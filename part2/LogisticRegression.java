@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.lang.Math;
 
 public class LogisticRegression {
 
@@ -19,26 +20,44 @@ public class LogisticRegression {
 
         /** TODO: Constructor initializes the weight vector. Initialize it by setting it to the 0 vector. **/
         public LogisticRegression(int n) { // n is the number of weights to be learned
+        	weights = new double[n];
+        	for (int i = 0; i < n; i++) {
+        		weights[i] = 0;
+        	}
         }
 
         /** TODO: Implement the function that returns the L2 norm of the weight vector **/
         private double weightsL2Norm(){
+        	double norm = 0;
+        	for(int i = 0; i < weights.length; i++) {
+        		norm += Math.pow(weights[i], 2);
+        	}
+        	return Math.sqrt(norm);
         }
 
         /** TODO: Implement the sigmoid function **/
         private static double sigmoid(double z) {
+        	return 1 / (1 + Math.exp(z)); // note: z is already negative
         }
 
         /** TODO: Helper function for prediction **/
         /** Takes a test instance as input and outputs the probability of the label being 1 **/
         /** This function should call sigmoid() **/
         private double probPred1(double[] x) {
+        	double exponent = 0;
+        	for (int i = 0; i < weights.length; i++) {
+        		exponent -= weights[i] * x[i]; // subtracting from the total so that z is negative in sigmoid
+        	}
+        	return sigmoid(exponent);
+        	
         }
 
         /** TODO: The prediction function **/
         /** Takes a test instance as input and outputs the predicted label **/
         /** This function should call probPred1() **/
         public int predict(double[] x) {
+        	double prob = probPred1(x);
+        	return prob >= 0.5 ? 1 : 0;
         }
 
         /** This function takes a test set as input, call the predict() to predict a label for it, and prints the accuracy, P, R, and F1 score of the positive class and negative class and the confusion matrix **/
@@ -79,6 +98,8 @@ public class LogisticRegression {
 
             /** TODO: Constructor for initializing the Instance object **/
             public LRInstance(int label, double[] x) {
+            	this.x = x;
+            	this.label = label;
             }
         }
 
