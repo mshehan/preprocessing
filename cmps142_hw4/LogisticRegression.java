@@ -19,7 +19,6 @@ public class LogisticRegression {
 
         /** TODO: Constructor initializes the weight vector. Initialize it by setting it to the 0 vector. **/
         public LogisticRegression(int n) { // n is the number of weights to be learned
-            weights = {0};
         }
 
         /** TODO: Implement the function that returns the L2 norm of the weight vector **/
