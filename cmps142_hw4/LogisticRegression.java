@@ -30,18 +30,17 @@ public class LogisticRegression {
 
         /** TODO: Implement the function that returns the L2 norm of the weight vector **/
         private double weightsL2Norm(){
-
         	double norm = 0;
         	for(int i = 0; i < weights.length; i++) {
         		norm += Math.pow(weights[i], 2);
         	}
+
         	return Math.sqrt(norm);
         }
 
         /** TODO: Implement the sigmoid function **/
         private static double sigmoid(double z) {
-        	// System.out.println("Z: " + z);
-        	return 1 / (1 + Math.exp(z)); // note: z is already negative
+        	return 1 / (1 + Math.exp(-1*z)); // note: z is already negative
         }
 
         /** TODO: Helper function for prediction **/
@@ -49,12 +48,9 @@ public class LogisticRegression {
         /** This function should call sigmoid() **/
         private double probPred1(double[] x) {
         	double exponent = 0;
-        	// System.out.println("Instance cross weights:");
         	for (int i = 0; i < weights.length; i++) {
-        		// System.out.println(weights[i] * x[i]);
-        		exponent -= weights[i] * x[i]; // subtracting from the total so that z is negative in sigmoid
+        		exponent += weights[i] * x[i]; 
         	}
-        	// System.out.println(exponent);
         	return sigmoid(exponent);
         }
 
@@ -63,7 +59,7 @@ public class LogisticRegression {
         /** This function should call probPred1() **/
         public int predict(double[] x) {
         	double prob = probPred1(x);
-        	// System.out.println(prob);
+        	//System.out.println(prob);
         	return prob >= 0.5 ? 1 : 0;
         }
 
@@ -75,43 +71,58 @@ public class LogisticRegression {
             int TP=0, TN=0, FP=0, FN=0; // TP = True Positives, TN = True Negatives, FP = False Positives, FN = False Negatives
 
             // TODO: write code here to compute the above mentioned variables
-
+            for(int i = 0; i < testInstances.size(); i++) {
+                LRInstance instance = testInstances.get(i);
+                double prediction = predict(instance.x);
+                if(instance.label == prediction && instance.label == 0){
+                    TN += 1;
+                }
+                if(instance.label == prediction && instance.label == 1){
+                    TP += 1;
+                }
+                if(instance.label != prediction && instance.label == 0) {
+                    FP += 1;
+                }
+                if(instance.label != prediction && instance.label == 1) {
+                    FN += 1;
+                }
+            }
+            acc = ((double)TP+TN)/testInstances.size();
+            p_pos = ((double)TP/(double)(TP+FP));
+            p_neg = ((double)TN/(double)(TN+FN));
+            r_pos = ((double)TP/(double)(TP+FN));
+            r_neg = ((double)TN/(double)(TN+FP));
+            f_pos = (2 * p_pos * r_pos) / (p_pos + r_pos);
+            f_neg = (2 * p_neg * r_neg) / (p_neg + r_neg);
             System.out.println("Accuracy="+acc);
-            System.out.println("P, R, and F1 score of the positive class=" + p_pos + " " + r_pos + " " + f_pos);
-            System.out.println("P, R, and F1 score of the negative class=" + p_neg + " " + r_neg + " " + f_neg);
+            System.out.printf("P, R, and F1 score of the positive class = %.2f %2.2f %2.2f\n",p_pos,r_pos,f_pos);
+            System.out.printf("P, R, and F1 score of the positive class = %.2f %2.2f %2.2f\n",p_neg, r_neg, f_neg);
             System.out.println("Confusion Matrix");
             System.out.println(TP + "\t" + FN);
             System.out.println(FP + "\t" + TN);
         }
 
-
-        /** Train the Logistic Regression using Stochastic Gradient Ascent **/
-        /** Also compute the log-likelihood of the data in this function **/
         public void train(List<LRInstance> instances) {
             for (int n = 0; n < ITERATIONS; n++) {
                 double lik = 0.0; // Stores log-likelihood of the training data for this iteration
-                for (int i=0; i < instances.size(); i++) {
+                
+                for (int i = 0; i < instances.size(); i++) {
                 	// System.out.print("Instance #" + i);
                     // TODO: Train the model
                     LRInstance instance = instances.get(i);
-                    double lik_j = predict(instance.x);
-                    int label = instance.label;
-                    double[] new_weights = new double[weights.length];
+                    double predicted_label = predict(instance.x);
                     
                     for (int feat = 0; feat < weights.length; feat++) {
-//                     	System.out.println("x[i]: " + instance.x[feat] + " - label: " + label + " - lik_j: " + lik_j);
-                    	new_weights[feat] = weights[feat] +
-                    		(rate * instance.x[feat] * label * lik_j);
-                    	if (new_weights[feat] != 0) {
-//                     		System.out.println(new_weights[feat]);
-                    	}
+                    	weights[feat] = weights[feat] + 
+                    		(rate * instance.x[feat] * (instance.label - predicted_label));
+                        lik += weights[feat]*instance.x[feat]*instance.label;
                     }
-                    weights = new_weights;
-                    
+                    //used the formula for log likelihood found here:
+                    // https://www.statlect.com/fundamentals-of-statistics/logistic-model-maximum-likelihood
                     // TODO: Compute the log-likelihood of the data here. Remember to take logs when necessary
-                    lik += Math.log(lik_j)/log2;
+                    lik += -Math.log(probPred1(instance.x));
 				}
-                System.out.println("\niteration: " + n + " lik: " + lik);
+                System.out.printf("iteration:%5d %2s lik:%13f\n", n, " ", lik);
             }
         }
 

@@ -26,14 +26,16 @@ p1: $(LR_JAVA).class
 $(LR_JAVA).class: $(LR)
 	javac $(LR) $(JFLAGS)
 
+
 p2: $(LRB_JAVA).class
 	java $(LRB_JAVA)
-$(LRB_JAVA):
+$(LRB_JAVA): $(LRB)
 	javac $(LRB) $(JFLAGS)
+
 
 p3: $(LRR_JAVA).class
 	java $(LRR_JAVA)
-$(LRR_JAVA).class: 
+$(LRR_JAVA).class: $(LRR)
 	javac $(LRR) $(JFLAGS)
 
 default: .java.class
