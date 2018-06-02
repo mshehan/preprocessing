@@ -23,7 +23,7 @@ public class LogisticRegression {
         /** TODO: Constructor initializes the weight vector. Initialize it by setting it to the 0 vector. **/
         public LogisticRegression(int n) { // n is the number of weights to be learned
         	weights = new double[n];
-        	for (int i = 0; i < n; i++) {
+        	for (int i = 1; i < n; i++) {
         		weights[i] = 0;
         	}
         }
@@ -32,15 +32,14 @@ public class LogisticRegression {
         private double weightsL2Norm(){
         	double norm = 0;
         	for(int i = 0; i < weights.length; i++) {
-        		norm += Math.pow(weights[i], 2);
+        		norm += Math.pow(weights[i],2);
         	}
-
         	return Math.sqrt(norm);
         }
 
         /** TODO: Implement the sigmoid function **/
         private static double sigmoid(double z) {
-        	return 1 / (1 + Math.exp(-1*z)); // note: z is already negative
+        	return 1 / (1 + Math.exp(-z));
         }
 
         /** TODO: Helper function for prediction **/
@@ -59,7 +58,6 @@ public class LogisticRegression {
         /** This function should call probPred1() **/
         public int predict(double[] x) {
         	double prob = probPred1(x);
-        	//System.out.println(prob);
         	return prob >= 0.5 ? 1 : 0;
         }
 
@@ -94,9 +92,9 @@ public class LogisticRegression {
             r_neg = ((double)TN/(double)(TN+FP));
             f_pos = (2 * p_pos * r_pos) / (p_pos + r_pos);
             f_neg = (2 * p_neg * r_neg) / (p_neg + r_neg);
-            System.out.println("Accuracy="+acc);
-            System.out.printf("P, R, and F1 score of the positive class = %.2f %2.2f %2.2f\n",p_pos,r_pos,f_pos);
-            System.out.printf("P, R, and F1 score of the positive class = %.2f %2.2f %2.2f\n",p_neg, r_neg, f_neg);
+            System.out.printf("Accuracy=%2.4f\n",acc);
+            System.out.printf("P, R, and F1 score of the positive class = %.4f %2.4f %2.4f\n",p_pos,r_pos,f_pos);
+            System.out.printf("P, R, and F1 score of the negative class = %.4f %2.4f %2.4f\n",p_neg, r_neg, f_neg);
             System.out.println("Confusion Matrix");
             System.out.println(TP + "\t" + FN);
             System.out.println(FP + "\t" + TN);
@@ -107,15 +105,16 @@ public class LogisticRegression {
                 double lik = 0.0; // Stores log-likelihood of the training data for this iteration
                 
                 for (int i = 0; i < instances.size(); i++) {
-                	// System.out.print("Instance #" + i);
                     // TODO: Train the model
                     LRInstance instance = instances.get(i);
                     double predicted_label = probPred1(instance.x);
                     
                     for (int feat = 0; feat < weights.length; feat++) {
-                    	weights[feat] = weights[feat] + 
+                    	
+                        weights[feat] = weights[feat] +
                     		(rate * instance.x[feat] * (instance.label - predicted_label));
-                        lik += weights[feat]*instance.x[feat]*instance.label;
+                        
+                        lik += weights[feat]*instance.x[feat] * instance.label;
                     }
                     //used the formula for log likelihood found here:
                     // https://www.statlect.com/fundamentals-of-statistics/logistic-model-maximum-likelihood
@@ -154,7 +153,7 @@ public class LogisticRegression {
                     // every line in the input file represents an instance-label pair
                     int i = 0;
                     double[] data = new double[columns.length - 1];
-                    for (i=0; i < columns.length - 1; i++) {
+                    for (i = 0; i < columns.length - 1; i++) {
                         data[i] = Double.valueOf(columns[i]);
                     }
                     int label = Integer.parseInt(columns[i]); // last column is the label
@@ -181,7 +180,9 @@ public class LogisticRegression {
 
             System.out.println("Norm of the learned weights = "+logistic.weightsL2Norm());
             System.out.println("Length of the weight vector = "+logistic.weights.length);
-
+            // for(int i = 0; i < logistic.weights.length; i++){
+            //     System.out.println("weight vector = "+logistic.weights[i]);
+            // }
             // printing accuracy for different values of lambda
             System.out.println("-----------------Printing train set performance-----------------");
             logistic.printPerformance(trainInstances);
