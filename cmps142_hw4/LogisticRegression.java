@@ -116,8 +116,6 @@ public class LogisticRegression {
                         
                         lik += weights[feat]*instance.x[feat] * instance.label;
                     }
-                    //used the formula for log likelihood found here:
-                    // https://www.statlect.com/fundamentals-of-statistics/logistic-model-maximum-likelihood
                     // TODO: Compute the log-likelihood of the data here. Remember to take logs when necessary
                     lik += -Math.log(probPred1(instance.x));
 				}
