@@ -19,6 +19,10 @@ public class LogisticRegression_withBias {
 
         /** TODO: Constructor initializes the weight vector. Initialize it by setting it to the 0 vector. **/
         public LogisticRegression_withBias(int n) { // n is the number of weights to be learned
+        	weights = new double[n+1]; // we need to account for bias
+        	for (int i = 1; i < n+1; i++) {
+        		weights[i] = 0;
+        	}
         }
 
         /** TODO: Implement the function that returns the L2 norm of the weight vector **/
@@ -79,6 +83,12 @@ public class LogisticRegression_withBias {
 
             /** TODO: Constructor for initializing the Instance object **/
             public LRInstance(int label, double[] x) {
+            	int bias = x.length; // index of the bias, and length - 1 of the feature vector we need
+            	this.x = double[bias + 1]; // we want an extra feature, to account for the bias
+            	for (int i = 0; i < bias; i++) {
+            		this.x[i] = x[i];
+            	}
+            	this.x[bias] = 1; // weight is always there, so set it to 1.
             }
         }
 
