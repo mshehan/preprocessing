@@ -19,8 +19,8 @@ public class LogisticRegression_withBias {
 
         /** TODO: Constructor initializes the weight vector. Initialize it by setting it to the 0 vector. **/
         public LogisticRegression_withBias(int n) { // n is the number of weights to be learned
-        	weights = new double[n+1]; // we need to account for bias
-        	for (int i = 1; i < n+1; i++) {
+        	weights = new double[n]; // we need to account for bias
+        	for (int i = 1; i < n; i++) {
         		weights [i] = 0;
         	}
         }
