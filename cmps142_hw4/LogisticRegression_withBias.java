@@ -70,6 +70,7 @@ public class LogisticRegression_withBias {
             for(int i = 0; i < testInstances.size(); i++) {
                 LRInstance instance = testInstances.get(i);
                 double prediction = predict(instance.x);
+                // System.out.println(prediction + ", " + instance.label);
                 if(instance.label == prediction && instance.label == 0){
                     TN += 1;
                 }
@@ -131,6 +132,7 @@ public class LogisticRegression_withBias {
             /** TODO: Constructor for initializing the Instance object **/
             public LRInstance(int label, double[] x) {
             	// System.out.println(x.length);
+            	this.label = label;
             	int bias = x.length; // index of the bias, and length - 1 of the feature vector we need
             	this.x = new double[bias + 1]; // we want an extra feature, to account for the bias
             	for (int i = 0; i < bias; i++) {
